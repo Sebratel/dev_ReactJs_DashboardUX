@@ -1,0 +1,13 @@
+# Stack para Portainer. Acesso e por IP:porta - VITE_API_BASE_URL e "assado"
+# no bundle em build time (Vite), entao precisa apontar para o IP/porta
+# reais do backend ja no momento do build (nao e configuravel em runtime).
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: "${VITE_API_BASE_URL:-http://186.219.134.246:3210/api}"
+    ports:
+      - "3211:3211"
+    restart: unless-stopped
