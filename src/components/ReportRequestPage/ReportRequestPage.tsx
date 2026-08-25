@@ -1,5 +1,6 @@
 import { useForm } from 'react-hook-form';
 import type { ReportGenerationState } from '../../services/useReportGeneration';
+import { useReauth } from '../../services/useReauth';
 import './ReportRequestPage.css';
 
 type FormValues = {
@@ -41,6 +42,8 @@ export function ReportRequestPage({
   const intervaloInvalido = Boolean(dataInicio && dataFim && dataInicio > dataFim);
   const isRunning = status === 'running';
 
+  const reauth = useReauth();
+
   const onSubmit = handleSubmit(({ dataInicio, dataFim }) => {
     if (intervaloInvalido) return;
     generate(dataInicio, dataFim);
@@ -61,6 +64,21 @@ export function ReportRequestPage({
           Gerar Relatório
         </button>
       </form>
+
+      <div className="reauth-box">
+        <button
+          type="button"
+          className="reauth-button"
+          onClick={reauth.status === 'waiting-login' ? reauth.cancel : reauth.begin}
+        >
+          {reauth.status === 'waiting-login' ? 'Cancelar reautenticação' : 'Reautenticar'}
+        </button>
+        {reauth.status !== 'idle' && (
+          <p className={`reauth-message${reauth.status === 'failed' ? ' status-message-error' : ''}`}>
+            {reauth.message}
+          </p>
+        )}
+      </div>
 
       {status !== 'idle' && (
         <>
