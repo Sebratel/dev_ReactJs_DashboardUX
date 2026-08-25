@@ -1,0 +1,50 @@
+@import '@fontsource/dm-sans/400.css';
+@import '@fontsource/dm-sans/500.css';
+@import '@fontsource/dm-sans/700.css';
+
+:root {
+  --color-background: #f5f1e8;
+  --color-foreground: #111111;
+  --color-card: #ffffff;
+  --color-primary: #ffb000;
+  --color-primary-hover: #e69e00;
+  --color-primary-foreground: #111111;
+  --color-success: #16a34a;
+  --color-success-soft: #dcfce7;
+  --color-danger: #dc2626;
+  --color-danger-soft: #fee2e2;
+  --color-nodata: #9ca3af;
+  --color-nodata-soft: #f3f4f6;
+  --color-muted: #6b7280;
+  --color-border: #e5e0d5;
+  --color-grid: #e5e0d5;
+  --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  --radius-card: 0.75rem;
+  --radius-control: 0.5rem;
+  --shadow-card: 0 1px 3px 0 rgb(17 17 17 / 0.06), 0 1px 2px -1px rgb(17 17 17 / 0.04);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
