@@ -1,0 +1,311 @@
+.audit-tab {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.75rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-right: none;
+  border-radius: var(--radius-control) 0 0 var(--radius-control);
+  background: var(--color-card);
+  color: var(--color-foreground);
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  writing-mode: vertical-rl;
+  transition: right 0.55s cubic-bezier(0.22, 1, 0.36, 1), background 0.15s ease;
+}
+
+.audit-tab:hover {
+  background: var(--color-nodata-soft);
+}
+
+.audit-tab--panel-open {
+  right: min(1100px, 92vw);
+}
+
+.audit-tab__arrow {
+  writing-mode: horizontal-tb;
+  font-size: 1rem;
+  line-height: 1;
+  transition: transform 0.3s ease;
+}
+
+.audit-tab--panel-open .audit-tab__arrow {
+  transform: rotate(180deg);
+}
+
+.audit-panel {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: min(1100px, 92vw);
+  height: 100vh;
+  background: var(--color-background);
+  border-left: 1px solid var(--color-border);
+  box-shadow: -4px 0 24px rgb(17 17 17 / 0.12);
+  z-index: 30;
+  transform: translateX(100%);
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.audit-panel--open {
+  transform: translateX(0);
+}
+
+.audit-panel__content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  gap: 1.25rem;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  font-family: var(--font-sans);
+  color: var(--color-foreground);
+}
+
+.audit-panel__content--visible {
+  opacity: 1;
+}
+
+.audit-panel__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.audit-panel__header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.audit-panel__close {
+  border: none;
+  background: transparent;
+  color: var(--color-muted);
+  font-size: 0.875rem;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.audit-panel__close:hover {
+  color: var(--color-foreground);
+}
+
+.audit-panel__empty {
+  color: var(--color-muted);
+  font-size: 0.875rem;
+}
+
+.audit-panel__list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.audit-job {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 1rem 1.25rem;
+}
+
+.audit-job__summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  font-size: 0.8125rem;
+}
+
+.audit-job__id {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.audit-job__field {
+  color: var(--color-muted);
+}
+
+.audit-job__field strong {
+  color: var(--color-foreground);
+  font-weight: 500;
+}
+
+.audit-job__downloads {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.audit-job__downloads-label {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+
+.audit-download-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-control);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.audit-download-button:hover {
+  opacity: 0.85;
+}
+
+.audit-download-button--atendimento {
+  background: var(--color-nodata-soft);
+  color: var(--color-primary-hover);
+}
+
+.audit-download-button--hsm {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.audit-download-button--hsm-pos-instalacao {
+  background: color-mix(in srgb, var(--color-primary) 20%, white);
+  color: var(--color-primary-hover);
+}
+
+.audit-download-button--default {
+  background: var(--color-nodata-soft);
+  color: var(--color-muted);
+}
+
+.audit-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.audit-badge--pending,
+.audit-badge--running {
+  background: var(--color-nodata-soft);
+  color: var(--color-muted);
+}
+
+.audit-badge--done {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.audit-badge--failed {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.audit-report-badge {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.0625rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.audit-report-badge--atendimento {
+  background: var(--color-nodata-soft);
+  color: var(--color-primary-hover);
+}
+
+.audit-report-badge--hsm {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.audit-report-badge--hsm-pos-instalacao {
+  background: color-mix(in srgb, var(--color-primary) 20%, white);
+  color: var(--color-primary-hover);
+}
+
+.audit-report-badge--default {
+  background: var(--color-nodata-soft);
+  color: var(--color-muted);
+}
+
+.audit-job__poll-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.375rem 0;
+  color: var(--color-muted);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.audit-job__poll-divider::before,
+.audit-job__poll-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.audit-job__steps {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.audit-job__poll-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.audit-job__step {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  line-height: 1.5;
+}
+
+.audit-job__step time {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.audit-job__step-percent {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-primary-hover);
+  font-weight: 600;
+}
