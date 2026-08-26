@@ -20,6 +20,10 @@ type ReportRequestPageProps = ReportGenerationState & {
   generate: (dataInicio: string, dataFim: string) => void;
 };
 
+function today(): string {
+  return new Date().toLocaleDateString('sv-SE'); // yyyy-mm-dd, formato aceito por <input type="date">
+}
+
 export function ReportRequestPage({
   status,
   percent,
@@ -33,7 +37,7 @@ export function ReportRequestPage({
     watch,
     formState: { errors, touchedFields },
   } = useForm<FormValues>({
-    defaultValues: { dataInicio: '', dataFim: '' },
+    defaultValues: { dataInicio: today(), dataFim: today() },
     mode: 'onChange',
   });
 
@@ -50,59 +54,86 @@ export function ReportRequestPage({
   });
 
   return (
-    <div className="report-request-page">
-      <form onSubmit={onSubmit}>
-        <input type="date" {...register('dataInicio', { required: true })} />
-        {errors.dataInicio && touchedFields.dataInicio && <span className="error">Campo obrigatório</span>}
-
-        <input type="date" {...register('dataFim', { required: true })} />
-        {intervaloInvalido && (touchedFields.dataInicio || touchedFields.dataFim) && (
-          <span className="error">Data de início deve ser anterior à data de fim</span>
-        )}
-
-        <button type="submit" disabled={!dataInicio || !dataFim || intervaloInvalido || isRunning}>
-          Gerar Relatório
-        </button>
-      </form>
-
-      <div className="reauth-box">
-        <button
-          type="button"
-          className="reauth-button"
-          onClick={reauth.status === 'waiting-login' ? reauth.cancel : reauth.begin}
-        >
-          {reauth.status === 'waiting-login' ? 'Cancelar reautenticação' : 'Reautenticar'}
-        </button>
-        {reauth.status !== 'idle' && (
-          <p className={`reauth-message${reauth.status === 'failed' ? ' status-message-error' : ''}`}>
-            {reauth.message}
+    <div className="hero-layout">
+      <div className="hero-panel">
+        <div className="hero-panel__image" />
+        <div className="hero-panel__scrim" />
+        <div className="hero-panel__content">
+          <div className="hero-brand">
+            <img src="/sebratel-logo.svg" alt="" className="hero-brand__mark" />
+            <span className="hero-brand__name">Sebratel Hub</span>
+          </div>
+          <h1 className="hero-panel__title">
+            A conexão que <span>consolida</span> o que importa.
+          </h1>
+          <p className="hero-panel__subtitle">
+            Consolidação dos relatórios de atendimento, HSM e pós-instalação do Matrix em um só lugar.
           </p>
-        )}
+        </div>
       </div>
 
-      {status !== 'idle' && (
-        <>
-          <div className="progress-bar">
-            <div className="progress-bar__fill" style={{ width: `${percent}%` }} />
-          </div>
-          <div className="status-box">
-            {splitStatusMessage(message).map((line, index) => (
-              <p
-                key={index}
-                className={`status-message${status === 'failed' ? ' status-message-error' : ''}`}
-              >
-                {line}
+      <div className="hero-card-wrap">
+        <div className="report-request-page">
+          <span className="report-request-page__badge">Consolidador</span>
+          <h2 className="report-request-page__title">Gerar relatório</h2>
+          <p className="report-request-page__subtitle">
+            Escolha o período e gere os relatórios consolidados do Matrix.
+          </p>
+
+          <form onSubmit={onSubmit}>
+            <input type="date" {...register('dataInicio', { required: true })} />
+            {errors.dataInicio && touchedFields.dataInicio && <span className="error">Campo obrigatório</span>}
+
+            <input type="date" {...register('dataFim', { required: true })} />
+            {intervaloInvalido && (touchedFields.dataInicio || touchedFields.dataFim) && (
+              <span className="error">Data de início deve ser anterior à data de fim</span>
+            )}
+
+            <button type="submit" disabled={!dataInicio || !dataFim || intervaloInvalido || isRunning}>
+              Gerar Relatório
+            </button>
+          </form>
+
+          <div className="reauth-box">
+            <button
+              type="button"
+              className="reauth-button"
+              onClick={reauth.status === 'waiting-login' ? reauth.cancel : reauth.begin}
+            >
+              {reauth.status === 'waiting-login' ? 'Cancelar reautenticação' : 'Reautenticar'}
+            </button>
+            {reauth.status !== 'idle' && (
+              <p className={`reauth-message${reauth.status === 'failed' ? ' status-message-error' : ''}`}>
+                {reauth.message}
               </p>
-            ))}
+            )}
           </div>
 
-          {status === 'done' && downloadUrl && (
-            <a className="download-link" href={downloadUrl} download>
-              Baixar CSV
-            </a>
+          {status !== 'idle' && (
+            <>
+              <div className="progress-bar">
+                <div className="progress-bar__fill" style={{ width: `${percent}%` }} />
+              </div>
+              <div className="status-box">
+                {splitStatusMessage(message).map((line, index) => (
+                  <p
+                    key={index}
+                    className={`status-message${status === 'failed' ? ' status-message-error' : ''}`}
+                  >
+                    {line}
+                  </p>
+                ))}
+              </div>
+
+              {status === 'done' && downloadUrl && (
+                <a className="download-link" href={downloadUrl} download>
+                  Baixar CSV
+                </a>
+              )}
+            </>
           )}
-        </>
-      )}
+        </div>
+      </div>
     </div>
   );
 }

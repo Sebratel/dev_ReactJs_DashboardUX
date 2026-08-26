@@ -1,16 +1,148 @@
+.hero-layout {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  overflow: auto;
+  background: var(--color-background);
+}
+
+.hero-panel {
+  position: relative;
+  flex: 1.4 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  color: #ffffff;
+}
+
+.hero-panel__image {
+  position: absolute;
+  inset: 0;
+  background-image: url('/login-hero.png');
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-panel__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    rgba(10, 8, 6, 0.94) 0%,
+    rgba(10, 8, 6, 0.8) 40%,
+    rgba(10, 8, 6, 0.45) 100%
+  );
+}
+
+.hero-panel__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 34rem;
+  padding: 3rem;
+}
+
+.hero-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.hero-brand__mark {
+  width: 2rem;
+  height: 2rem;
+}
+
+.hero-brand__name {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hero-panel__title {
+  margin: 0;
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.hero-panel__title span {
+  color: var(--color-primary);
+}
+
+.hero-panel__subtitle {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.hero-card-wrap {
+  flex: 1 1 0;
+  min-width: 22rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
 .report-request-page {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   max-width: 420px;
   width: 100%;
-  margin: 0 auto;
   padding: 2rem;
   background: var(--color-card);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-card-lg);
   box-shadow: var(--shadow-card);
   font-family: var(--font-sans);
+}
+
+.report-request-page__badge {
+  align-self: flex-start;
+  padding: 0.375rem 0.75rem;
+  border-radius: 999px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.report-request-page__title {
+  margin: -1rem 0 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-foreground);
+}
+
+.report-request-page__subtitle {
+  margin: -1rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-muted);
+}
+
+@media (max-width: 860px) {
+  .hero-layout {
+    position: static;
+    min-height: 100vh;
+  }
+
+  .hero-panel {
+    display: none;
+  }
+
+  .hero-card-wrap {
+    min-width: 0;
+    width: 100%;
+  }
 }
 
 .report-request-page form {

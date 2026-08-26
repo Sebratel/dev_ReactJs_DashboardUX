@@ -6,9 +6,11 @@
   --color-background: #f5f1e8;
   --color-foreground: #111111;
   --color-card: #ffffff;
-  --color-primary: #ffb000;
-  --color-primary-hover: #e69e00;
-  --color-primary-foreground: #111111;
+  --color-primary: #ffb800;
+  --color-primary-hover: #e6a600;
+  --color-primary-foreground: #1a0f00;
+  --color-primary-soft: rgb(255 176 0 / 15%);
+  --color-primary-strong: #8a5a00;
   --color-success: #16a34a;
   --color-success-soft: #dcfce7;
   --color-danger: #dc2626;
@@ -20,6 +22,7 @@
   --color-grid: #e5e0d5;
   --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
   --radius-card: 0.75rem;
+  --radius-card-lg: 1.25rem;
   --radius-control: 0.5rem;
   --shadow-card: 0 1px 3px 0 rgb(17 17 17 / 0.06), 0 1px 2px -1px rgb(17 17 17 / 0.04);
 }
