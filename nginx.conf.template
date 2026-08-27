@@ -1,0 +1,57 @@
+server {
+    listen 3211;
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # Reverse proxy para o BFF (Spring Boot) - mesmo dominio/origem do
+    # frontend, entao o browser nao precisa de CORS para chamar /api.
+    # ${API_UPSTREAM} etc vem do ambiente do container (ver Dockerfile p/
+    # defaults de producao) - substituidos pelo envsubst do entrypoint
+    # oficial da imagem nginx (arquivos em /etc/nginx/templates/*.template).
+    location /api/ {
+        proxy_pass http://${API_UPSTREAM}/api/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Reverse proxy para o servico de automacao (Node/Playwright).
+    location /automation/ {
+        proxy_pass http://${AUTOMATION_UPSTREAM}/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # noVNC do fluxo de reautenticacao manual na Matrix (ver
+    # automation/src/reauth.js) - precisa de upgrade de conexao p/ websocket.
+    location /vnc/ {
+        proxy_pass http://${VNC_UPSTREAM}/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # O client noVNC (UI.js) conecta o websocket num path fixo na RAIZ do
+    # dominio ("/websockify"), independente do path onde vnc.html foi
+    # carregado (ver location /vnc/ acima) - por isso precisa de uma
+    # location propria, nao cai dentro de /vnc/.
+    location /websockify {
+        proxy_pass http://${VNC_UPSTREAM}/websockify;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # SPA: qualquer rota desconhecida cai no index.html (roteamento no client).
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}

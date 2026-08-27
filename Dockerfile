@@ -19,5 +19,12 @@ RUN npm run build
 # ---- Stage 2: runtime (Nginx servindo os arquivos estaticos) ----
 FROM nginx:1.27-alpine
 COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Template (nao .conf direto) - o entrypoint oficial da imagem roda envsubst
+# nos arquivos de /etc/nginx/templates/*.template e escreve o resultado em
+# /etc/nginx/conf.d/ ja no start do container, usando as env vars abaixo
+# (sobrescreviveis via docker-compose.yml sem rebuildar a imagem).
+COPY nginx.conf.template /etc/nginx/templates/default.conf.template
+ENV API_UPSTREAM=186.219.134.246:3210 \
+    AUTOMATION_UPSTREAM=186.219.134.246:3212 \
+    VNC_UPSTREAM=186.219.134.246:6080
 EXPOSE 3211

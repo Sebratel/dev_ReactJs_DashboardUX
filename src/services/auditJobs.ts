@@ -24,8 +24,10 @@ const JOBS_URL = `${API_BASE_URL}/reports/jobs`;
 export function resolveDownloadUrl(relativeUrl: string): string {
   // O backend devolve paths relativos (ex.: "/api/reports/jobs/{id}/download/hsm"),
   // relativos a origem do BFF - nao a origem do Vite em dev. Ver mesma regra
-  // em reportGeneration.ts.
-  const apiOrigin = new URL(API_BASE_URL).origin;
+  // em reportGeneration.ts. API_BASE_URL pode ser absoluto ou relativo (ex.:
+  // "/api") - o segundo argumento de URL() resolve o relativo contra a
+  // origem atual e e ignorado quando API_BASE_URL ja e absoluto.
+  const apiOrigin = new URL(API_BASE_URL, window.location.origin).origin;
   return `${apiOrigin}${relativeUrl}`;
 }
 
