@@ -9,9 +9,10 @@ RUN npm ci
 COPY . .
 
 # Vite le VITE_* do ambiente do processo de build (prioridade sobre .env.*),
-# entao isso baked no bundle final - se o host/dominio real do backend em
-# produção for diferente, sobrescreva este ARG no build (docker-compose.yml).
-ARG VITE_API_BASE_URL=http://186.219.134.246:3210/api
+# entao isso baked no bundle final. Default relativo (mesma origem) porque o
+# nginx deste servico faz reverse proxy de /api pro BFF (ver nginx.conf) -
+# so sobrescreva este ARG se o BFF nao estiver atras deste proxy.
+ARG VITE_API_BASE_URL=/api
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 RUN npm run build
 

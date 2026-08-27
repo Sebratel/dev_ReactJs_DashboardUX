@@ -1,13 +1,15 @@
-# Stack para Portainer. Acesso e por IP:porta - VITE_API_BASE_URL e "assado"
-# no bundle em build time (Vite), entao precisa apontar para o IP/porta
-# reais do backend ja no momento do build (nao e configuravel em runtime).
+# Stack para Portainer. VITE_API_BASE_URL e "assado" no bundle em build
+# time (Vite), mas agora o proprio nginx deste servico faz reverse proxy de
+# /api, /automation e /vnc para os outros servicos (ver nginx.conf), entao o
+# default e relativo (mesma origem) - so precisa apontar pra outro lugar se
+# o BFF nao estiver atras deste mesmo proxy.
 services:
   frontend:
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        VITE_API_BASE_URL: "${VITE_API_BASE_URL:-http://186.219.134.246:3210/api}"
+        VITE_API_BASE_URL: "${VITE_API_BASE_URL:-/api}"
     ports:
       - "3211:3211"
     restart: unless-stopped
