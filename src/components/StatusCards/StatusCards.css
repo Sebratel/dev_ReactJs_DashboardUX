@@ -1,0 +1,73 @@
+/*
+ * position: fixed (nao sticky) de proposito: #root usa display:flex +
+ * align-items/justify-content:center (pensado pra so um card centralizado
+ * por vez, ver index.css) - qualquer elemento normal-flow adicionado como
+ * irmao do Dashboard/ReportRequestPage quebra essa centralizacao (o card
+ * de status acaba centralizado verticalmente no meio da pagina inteira, em
+ * vez de fixo no topo). fixed tira o componente do fluxo, ignorando o flex
+ * do #root.
+ */
+.status-cards {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem 0;
+  pointer-events: none;
+}
+
+.status-cards .status-card {
+  width: 100%;
+  max-width: 420px;
+  pointer-events: auto;
+}
+
+.status-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: var(--color-danger-soft);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-control);
+  padding: 0.6rem 0.75rem;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 6%);
+}
+
+.status-card__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.status-card__title {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-danger);
+}
+
+.status-card__message {
+  margin: 0.15rem 0 0;
+  font-size: 0.78rem;
+  color: var(--color-foreground);
+  word-break: break-word;
+}
+
+.status-card__dismiss {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  color: var(--color-danger);
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.15rem;
+}
+
+.status-card__dismiss:hover {
+  opacity: 0.7;
+}

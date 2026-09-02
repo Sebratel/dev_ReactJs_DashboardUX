@@ -1,9 +1,17 @@
 export type ReportProgress = {
+  // 'done' significa "pelo menos um relatorio ja pode ser exibido" - tanto
+  // sucesso total quanto parcial (ver fetchReportJobStatus). 'failed' so
+  // ocorre quando NENHUM relatorio ficou disponivel.
   status: 'running' | 'done' | 'failed';
   percent: number;
   message: string;
   downloadUrl: string | null;
   reportDownloadUrls: Record<string, string>;
+  // Erro de cada relatorio que falhou (chave = "atendimento"/"hsm"/
+  // "hsmPosInstalacao"), mesmo quando o job como um todo virou 'done' por
+  // causa dos outros relatorios terem dado certo - usado pra render dos
+  // cards de aviso no topo da tela, ver StatusCards.
+  errors: Record<string, string>;
 };
 
 type ReportJobCreatedResponse = {
@@ -17,6 +25,7 @@ type ReportJobStatusResponse = {
   message: string;
   downloadUrl: string | null;
   reportDownloadUrls?: Record<string, string>;
+  errors?: Record<string, string>;
 };
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -62,19 +71,26 @@ export async function fetchReportJobStatus(jobId: string): Promise<ReportProgres
   }
 
   const job: ReportJobStatusResponse = await response.json();
+  const reportDownloadUrls = job.reportDownloadUrls ?? {};
 
-  if (job.status === 'FAILED') {
+  // FAILED com pelo menos um relatorio disponivel = falha PARCIAL - nao
+  // trata como erro fatal (nao lanca), so repassa os erros por relatorio
+  // pra virarem cards de aviso; a tela segue pro dashboard com o que deu
+  // certo. So quando NENHUM relatorio ficou disponivel e que e falha total.
+  const hasAnyReport = Object.keys(reportDownloadUrls).length > 0;
+  if (job.status === 'FAILED' && !hasAnyReport) {
     throw new Error(job.message);
   }
 
   return {
-    status: job.status === 'DONE' ? 'done' : 'running',
+    status: job.status === 'DONE' || (job.status === 'FAILED' && hasAnyReport) ? 'done' : 'running',
     percent: job.percent,
     message: job.message,
     // Construido a partir do jobId, e nao do downloadUrl relativo que o
     // BFF devolve - aquele path e relativo a origem do BFF (ex: :8081),
     // que e diferente da origem do Vite em dev (ex: :5173).
     downloadUrl: job.status === 'DONE' ? `${JOBS_URL}/${job.jobId}/download` : null,
-    reportDownloadUrls: job.reportDownloadUrls ?? {},
+    reportDownloadUrls,
+    errors: job.errors ?? {},
   };
 }

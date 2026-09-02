@@ -45,6 +45,7 @@ export function ReportRequestPage({
 
   const dataInicio = watch('dataInicio');
   const dataFim = watch('dataFim');
+  const modo = watch('modo');
   const intervaloInvalido = Boolean(dataInicio && dataFim && dataInicio > dataFim);
   const isRunning = status === 'running';
 
@@ -93,20 +94,25 @@ export function ReportRequestPage({
         </button>
       </form>
 
-      <div className="reauth-box">
-        <button
-          type="button"
-          className="reauth-button"
-          onClick={reauth.status === 'waiting-login' ? reauth.cancel : reauth.begin}
-        >
-          {reauth.status === 'waiting-login' ? 'Cancelar reautenticação' : 'Reautenticar'}
-        </button>
-        {reauth.status !== 'idle' && (
-          <p className={`reauth-message${reauth.status === 'failed' ? ' status-message-error' : ''}`}>
-            {reauth.message}
-          </p>
-        )}
-      </div>
+      {/* So faz sentido no modo noVNC: a sessao de browser (Playwright) que
+          esse botao reautentica nao existe no modo "api" (matrixAuth.js se
+          autentica sozinho via login/senha, sem sessao nenhuma). */}
+      {modo === 'novnc' && (
+        <div className="reauth-box">
+          <button
+            type="button"
+            className="reauth-button"
+            onClick={reauth.status === 'waiting-login' ? reauth.cancel : reauth.begin}
+          >
+            {reauth.status === 'waiting-login' ? 'Cancelar reautenticação' : 'Reautenticar'}
+          </button>
+          {reauth.status !== 'idle' && (
+            <p className={`reauth-message${reauth.status === 'failed' ? ' status-message-error' : ''}`}>
+              {reauth.message}
+            </p>
+          )}
+        </div>
+      )}
 
       {status !== 'idle' && (
         <>

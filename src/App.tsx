@@ -2,10 +2,17 @@ import { useEffect, useState } from 'react';
 import { AuditPanel } from './components/AuditPanel/AuditPanel';
 import { ReportRequestPage } from './components/ReportRequestPage/ReportRequestPage';
 import { Dashboard } from './components/Dashboard/Dashboard';
+import { StatusCards, type StatusCardItem } from './components/StatusCards/StatusCards';
 import { useReportGeneration } from './services/useReportGeneration';
 import { resolveReportDownloadUrl, type ReportMode } from './services/reportGeneration';
 
 const REQUIRED_REPORTS = ['atendimento', 'hsm', 'hsmPosInstalacao'] as const;
+
+const REPORT_LABELS: Record<string, string> = {
+  atendimento: 'Relatório de Atendimento',
+  hsm: 'Relatório Analítico de Mensagens HSM',
+  hsmPosInstalacao: 'HSM CX Pós-Instalação',
+};
 
 function formatBr(isoDate: string) {
   const [year, month, day] = isoDate.split('-');
@@ -28,27 +35,31 @@ function App() {
     reportGeneration.generate(dataInicio, dataFim, modo);
   };
 
-  // Assim que os 3 relatorios concorrentes terminam de baixar (ver
-  // NodeProcessReportJobRunner.java/reportDefinitions.js), busca o CSV bruto
-  // de cada um (endpoints /download/{report}) para montar a tela de
-  // dashboard - a consolidacao em UM arquivo final ainda nao existe, mas
-  // para a dashboard isso nao importa: ela so precisa dos 3 textos crus.
+  // Assim que PELO MENOS UM dos 3 relatorios concorrentes termina de baixar
+  // (ver HttpReportJobRunner.java/reportDefinitions.js), busca o CSV bruto
+  // dele (endpoints /download/{report}) para montar a tela de dashboard -
+  // relatorios que falharam ficam de fora (string vazia), e aparecem como
+  // aviso via StatusCards em vez de travar a tela toda esperando os 3.
   useEffect(() => {
     if (reportGeneration.status !== 'done' || dashboardCsvs) return;
 
     const urls = reportGeneration.reportDownloadUrls;
-    const hasAllReports = REQUIRED_REPORTS.every((key) => Boolean(urls[key]));
-    if (!hasAllReports) return;
+    const availableKeys = REQUIRED_REPORTS.filter((key) => Boolean(urls[key]));
+    if (availableKeys.length === 0) return;
 
     let cancelled = false;
     setLoadingDashboard(true);
     setLoadError(null);
 
-    Promise.all(
-      REQUIRED_REPORTS.map((key) => fetch(resolveReportDownloadUrl(urls[key])).then((r) => r.text())),
-    )
-      .then(([atendimento, hsm, envCx]) => {
-        if (!cancelled) setDashboardCsvs({ atendimento, hsm, envCx });
+    Promise.all(availableKeys.map((key) => fetch(resolveReportDownloadUrl(urls[key])).then((r) => r.text())))
+      .then((texts) => {
+        if (cancelled) return;
+        const csvByKey = Object.fromEntries(availableKeys.map((key, i) => [key, texts[i]]));
+        setDashboardCsvs({
+          atendimento: csvByKey.atendimento ?? '',
+          hsm: csvByKey.hsm ?? '',
+          envCx: csvByKey.hsmPosInstalacao ?? '',
+        });
       })
       .catch(() => {
         if (!cancelled) setLoadError('Falha ao carregar os dados para montar o dashboard.');
@@ -62,6 +73,20 @@ function App() {
     };
   }, [reportGeneration.status, reportGeneration.reportDownloadUrls, dashboardCsvs]);
 
+  // Avisos pontuais no topo da tela (nao bloqueiam nada): um por relatorio
+  // que falhou, mais o erro de rede/chamada da ultima tentativa, se houver.
+  // Ver StatusCards - cada um pode ser dispensado individualmente.
+  const statusCardItems: StatusCardItem[] = [
+    ...Object.entries(reportGeneration.errors).map(([key, message]) => ({
+      id: `report-error-${key}`,
+      title: REPORT_LABELS[key] ?? key,
+      message,
+    })),
+    ...(reportGeneration.requestError
+      ? [{ id: 'request-error', title: 'Falha de comunicação', message: reportGeneration.requestError }]
+      : []),
+  ];
+
   const handleVoltar = () => {
     setDashboardCsvs(null);
     setPeriodo(null);
@@ -71,6 +96,7 @@ function App() {
   if (dashboardCsvs && periodo) {
     return (
       <>
+        <StatusCards items={statusCardItems} />
         <Dashboard
           atendimentoCsv={dashboardCsvs.atendimento}
           hsmCsv={dashboardCsvs.hsm}
@@ -85,6 +111,7 @@ function App() {
 
   return (
     <>
+      <StatusCards items={statusCardItems} />
       <ReportRequestPage
         status={reportGeneration.status}
         percent={reportGeneration.percent}
