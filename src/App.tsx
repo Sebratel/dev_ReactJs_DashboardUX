@@ -122,6 +122,8 @@ function App() {
         }
         downloadUrl={reportGeneration.downloadUrl}
         reportDownloadUrls={reportGeneration.reportDownloadUrls}
+        errors={reportGeneration.errors}
+        requestError={reportGeneration.requestError}
         generate={handleGenerate}
       />
       <AuditPanel />
