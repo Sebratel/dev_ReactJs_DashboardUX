@@ -33,11 +33,17 @@ export function resolveReportDownloadUrl(relativeUrl: string): string {
   return `${apiOrigin}${relativeUrl}`;
 }
 
-export async function createReportJob(dataInicio: string, dataFim: string): Promise<string> {
+export type ReportMode = 'api' | 'novnc';
+
+export async function createReportJob(
+  dataInicio: string,
+  dataFim: string,
+  mode: ReportMode = 'api',
+): Promise<string> {
   const response = await fetch(JOBS_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ dataInicio, dataFim }),
+    body: JSON.stringify({ dataInicio, dataFim, mode }),
   });
 
   if (!response.ok) {

@@ -3,7 +3,7 @@ import { AuditPanel } from './components/AuditPanel/AuditPanel';
 import { ReportRequestPage } from './components/ReportRequestPage/ReportRequestPage';
 import { Dashboard } from './components/Dashboard/Dashboard';
 import { useReportGeneration } from './services/useReportGeneration';
-import { resolveReportDownloadUrl } from './services/reportGeneration';
+import { resolveReportDownloadUrl, type ReportMode } from './services/reportGeneration';
 
 const REQUIRED_REPORTS = ['atendimento', 'hsm', 'hsmPosInstalacao'] as const;
 
@@ -21,11 +21,11 @@ function App() {
   const [loadingDashboard, setLoadingDashboard] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const handleGenerate = (dataInicio: string, dataFim: string) => {
+  const handleGenerate = (dataInicio: string, dataFim: string, modo: ReportMode) => {
     setPeriodo({ inicio: dataInicio, fim: dataFim });
     setDashboardCsvs(null);
     setLoadError(null);
-    reportGeneration.generate(dataInicio, dataFim);
+    reportGeneration.generate(dataInicio, dataFim, modo);
   };
 
   // Assim que os 3 relatorios concorrentes terminam de baixar (ver

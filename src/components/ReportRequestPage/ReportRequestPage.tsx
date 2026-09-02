@@ -1,11 +1,13 @@
 import { useForm } from 'react-hook-form';
 import type { ReportGenerationState } from '../../services/useReportGeneration';
+import type { ReportMode } from '../../services/reportGeneration';
 import { useReauth } from '../../services/useReauth';
 import './ReportRequestPage.css';
 
 type FormValues = {
   dataInicio: string;
   dataFim: string;
+  modo: ReportMode;
 };
 
 // O backend combina o progresso dos 3 relatorios concorrentes numa unica
@@ -17,7 +19,7 @@ function splitStatusMessage(message: string): string[] {
 }
 
 type ReportRequestPageProps = ReportGenerationState & {
-  generate: (dataInicio: string, dataFim: string) => void;
+  generate: (dataInicio: string, dataFim: string, modo: ReportMode) => void;
 };
 
 function today(): string {
@@ -37,7 +39,7 @@ export function ReportRequestPage({
     watch,
     formState: { errors, touchedFields },
   } = useForm<FormValues>({
-    defaultValues: { dataInicio: today(), dataFim: today() },
+    defaultValues: { dataInicio: today(), dataFim: today(), modo: 'api' },
     mode: 'onChange',
   });
 
@@ -48,9 +50,9 @@ export function ReportRequestPage({
 
   const reauth = useReauth();
 
-  const onSubmit = handleSubmit(({ dataInicio, dataFim }) => {
+  const onSubmit = handleSubmit(({ dataInicio, dataFim, modo }) => {
     if (intervaloInvalido) return;
-    generate(dataInicio, dataFim);
+    generate(dataInicio, dataFim, modo);
   });
 
   return (
@@ -64,6 +66,18 @@ export function ReportRequestPage({
       <p className="report-request-page__subtitle">
         Escolha o período e gere os relatórios consolidados do Matrix.
       </p>
+
+      <fieldset className="mode-toggle">
+        <legend className="mode-toggle__legend">Origem dos dados</legend>
+        <label className="mode-toggle__option">
+          <input type="radio" value="api" {...register('modo')} />
+          API
+        </label>
+        <label className="mode-toggle__option">
+          <input type="radio" value="novnc" {...register('modo')} />
+          noVNC
+        </label>
+      </fieldset>
 
       <form onSubmit={onSubmit}>
         <input type="date" {...register('dataInicio', { required: true })} />

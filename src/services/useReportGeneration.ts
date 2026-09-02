@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import { createReportJob, fetchReportJobStatus, type ReportProgress } from './reportGeneration';
+import { createReportJob, fetchReportJobStatus, type ReportMode, type ReportProgress } from './reportGeneration';
 
 const POLL_INTERVAL_MS = 2000;
 
@@ -23,12 +23,12 @@ export function useReportGeneration() {
   const [state, setState] = useState<ReportGenerationState>(initialState);
   const stopRef = useRef(false);
 
-  const generate = useCallback(async (dataInicio: string, dataFim: string) => {
+  const generate = useCallback(async (dataInicio: string, dataFim: string, mode: ReportMode = 'api') => {
     stopRef.current = false;
     setState({ status: 'running', percent: 0, message: '', downloadUrl: null, reportDownloadUrls: {} });
 
     try {
-      const jobId = await createReportJob(dataInicio, dataFim);
+      const jobId = await createReportJob(dataInicio, dataFim, mode);
 
       let progress: ReportProgress;
       do {
