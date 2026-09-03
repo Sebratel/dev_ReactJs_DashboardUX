@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 import { fmtSecs, tagClass, friendlyTag, STATUS_COLORS, type Row } from './csvParsing';
 import type { DrawerState } from './types';
 
+const PAGE_SIZE = 300;
+
 const TIPO_COLORS: Record<string, [string, string]> = {
   Automático: ['#fbf2da', '#854d0e'],
   Misto: ['#eff4ff', '#1e40af'],
@@ -29,6 +31,7 @@ export function DrawerTable({ drawer, allRows, onClose }: { drawer: DrawerState;
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [recFilter, setRecFilter] = useState('');
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const baseRows = useMemo(() => (drawer ? allRows.filter(drawer.predicate) : []), [drawer, allRows]);
 
@@ -41,6 +44,15 @@ export function DrawerTable({ drawer, allRows, onClose }: { drawer: DrawerState;
       return true;
     });
   }, [baseRows, search, statusFilter, recFilter]);
+
+  const filterKey = `${drawer?.title ?? ''}|${search}|${statusFilter}|${recFilter}`;
+  const [lastFilterKey, setLastFilterKey] = useState(filterKey);
+  if (filterKey !== lastFilterKey) {
+    setLastFilterKey(filterKey);
+    setVisibleCount(PAGE_SIZE);
+  }
+
+  const visibleRows = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
 
   if (!drawer) return null;
 
@@ -88,7 +100,7 @@ export function DrawerTable({ drawer, allRows, onClose }: { drawer: DrawerState;
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((r, i) => (
+                {visibleRows.map((r, i) => (
                   <tr key={i}>
                     <td className="mono">{r.protocolo}</td>
                     <td className="bold">{r.contato}</td>
@@ -123,9 +135,16 @@ export function DrawerTable({ drawer, allRows, onClose }: { drawer: DrawerState;
           ) : (
             <div className="dash-no-r">Nenhum resultado.</div>
           )}
+          {visibleRows.length < filtered.length && (
+            <div className="dash-drw-loadmore">
+              <button type="button" onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}>
+                Carregar mais ({filtered.length - visibleRows.length} restantes)
+              </button>
+            </div>
+          )}
         </div>
         <div className="dash-drw-foot">
-          {filtered.length} de {baseRows.length} registro{baseRows.length !== 1 ? 's' : ''}
+          {visibleRows.length} de {filtered.length} filtrado{filtered.length !== 1 ? 's' : ''} ({baseRows.length} no total)
         </div>
       </div>
     </div>

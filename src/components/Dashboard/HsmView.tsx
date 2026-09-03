@@ -205,15 +205,17 @@ export function HsmView({
               <b>{nf(failTotal)}</b> mensagens não entregues no período. Clique em um motivo para ver as mensagens.
             </div>
             {failEntries.slice(0, 20).map(([reason, v], i) => (
-              <div key={reason} className="dash-bar-row is-clickable" onClick={() => setFailSel(failSel === i ? -1 : i)}>
-                <div className="dash-bar-lbl dash-bar-lbl--wide" title={reason}>
+              <div key={reason} className="dash-bar-block is-clickable" onClick={() => setFailSel(failSel === i ? -1 : i)}>
+                <div className="dash-bar-block-lbl" title={reason}>
                   {reason}
                 </div>
-                <div className="dash-bar-track">
-                  <div className="dash-bar-fill" style={{ width: `${((v / failMax) * 100).toFixed(1)}%`, background: 'var(--color-danger)' }} />
+                <div className="dash-bar-block-row">
+                  <div className="dash-bar-track">
+                    <div className="dash-bar-fill" style={{ width: `${((v / failMax) * 100).toFixed(1)}%`, background: 'var(--color-danger)' }} />
+                  </div>
+                  <div className="dash-bar-num">{nf(v)}</div>
+                  <div className="dash-bar-pct">{((v / failTotal) * 100).toFixed(0)}%</div>
                 </div>
-                <div className="dash-bar-num">{nf(v)}</div>
-                <div className="dash-bar-pct">{((v / failTotal) * 100).toFixed(0)}%</div>
               </div>
             ))}
             {failSel >= 0 && (
